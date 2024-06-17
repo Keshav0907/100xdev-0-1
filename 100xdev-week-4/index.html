@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <script>
+    let globalId = 1;
+    let todoState = [];
+    let oldTodoState = [];
+
+      function addTodoToDom() {
+        
+        const divEle = document.getElementById("todos");
+
+        divEle.textContent = " ";
+
+        todoState.map( (todo) => {
+
+          divEle.appendChild(document.createTextNode("Title : "));
+          divEle.append(todo.title);
+          divEle.append(document.createElement("br"))
+          divEle.appendChild(document.createTextNode("Description:  "));
+          divEle.append(todo.description);
+          divEle.append(document.createElement("br"))
+          
+        })
+      
+      }
+
+    function removeTodoFromDom(todos) {
+        oldTodoState = todoState.slice();
+        const idsToRemove = todos.map(todo => todo.id);
+        todoState = todoState.filter(todo => !idsToRemove.includes(todo.id));
+        console.log(oldTodoState);
+        console.log(todoState);
+        addTodoToDom();
+    }
+
+    // assuming todo object is being passed here
+
+    function updateTodoInDom(oldTodo, newTodo) {
+    // Find the index of the oldTodo in todoState
+    oldTodoState = todoState.slice();
+  
+    const index = todoState.findIndex(todo => todo.id === oldTodo.id);
+
+    if (index !== -1) {
+        // Replace the oldTodo with the newTodo at the found index
+        todoState[index] = newTodo;
+    }
+
+    console.log(oldTodoState);
+    console.log(todoState);
+
+    // updateState(todoState);
+    addTodoToDom();
+}
+
+
+    function updateState(newTodos) {
+    const added = [];
+    const deleted = [];
+    const updated = [];
+
+  
+    newTodos.forEach(newTodo => {
+        const oldTodoIndex = oldTodoState.findIndex(oldTodo => oldTodo.id === newTodo.id);
+
+        if (oldTodoIndex === -1) {
+            // If todo is not found in oldTodoState, it's added
+            added.push(newTodo);
+        } else {
+            // If todo is found, check if it's updated
+            if (oldTodoState[oldTodoIndex].title !== newTodo.title ||
+                oldTodoState[oldTodoIndex].description !== newTodo.description) {
+                updated.push(newTodo);
+            }
+        }
+    });
+
+    // Iterate through oldTodoState to find deleted todos
+    oldTodoState.forEach(oldTodo => {
+        const stillExists = newTodos.some(newTodo => newTodo.id === oldTodo.id);
+        if (!stillExists) {
+            // If todo is not found in newTodos, it's deleted
+            deleted.push(oldTodo);
+        }
+    });
+    
+    oldTodoState = newTodos;
+    todoState = newTodos;
+    addTodoToDom();
+}
+
+    function addTodo() {
+      const title = document.getElementById("title").value;
+      const description = document.getElementById("description").value;
+      todoState.push({
+        title: title,
+        description: description,
+        id: globalId++,
+      })
+      //updateState(todoState); 
+      addTodoToDom()
+    }
+  </script>
+</head>
+
+<body>
+  <input type="text" id="title" placeholder="Todo title"></input> <br /><br />
+  <input type="text" id="description" placeholder="Todo description"></input> <br /><br />
+  <button onclick="addTodo()">Add todo</button>
+  <button onclick="removeTodoFromDom([{
+    title : 'frontend',
+    description: 'nknka',
+    id: 1
+  }])">Remove</button>
+  <br /> <br />
+
+  <div id="todos">
+
+  </div>
+ 
+
+<!-- <button onclick="removeTodoFromDom([{
+  title : 'frontend',
+  description: 'nknka',
+  id: 1
+}])"></button> -->
+
+
+</body>
+
+</html>
